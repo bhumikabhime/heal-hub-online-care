@@ -59,6 +59,13 @@ const AuthPage = () => {
     setLoading(true);
     
     try {
+      // Validate form inputs
+      if (!email || !password || !firstName || !lastName) {
+        throw new Error("All fields are required");
+      }
+      
+      console.log("Signing up with:", { email, password, firstName, lastName });
+      
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -80,6 +87,8 @@ const AuthPage = () => {
       // Redirect to login page after successful registration
       navigate('/login');
     } catch (error: any) {
+      console.error("Sign up error:", error);
+      
       toast({
         title: "Error signing up",
         description: error.message,
