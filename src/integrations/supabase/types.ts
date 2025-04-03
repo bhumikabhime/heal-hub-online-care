@@ -9,7 +9,116 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          appointment_date: string
+          appointment_time: string
+          created_at: string
+          doctor_id: string
+          id: string
+          location: string
+          patient_email: string
+          patient_name: string
+          reason: string | null
+          status: string
+        }
+        Insert: {
+          appointment_date: string
+          appointment_time: string
+          created_at?: string
+          doctor_id: string
+          id?: string
+          location: string
+          patient_email: string
+          patient_name: string
+          reason?: string | null
+          status?: string
+        }
+        Update: {
+          appointment_date?: string
+          appointment_time?: string
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          location?: string
+          patient_email?: string
+          patient_name?: string
+          reason?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doctors: {
+        Row: {
+          created_at: string
+          experience: string
+          id: string
+          image_url: string | null
+          name: string
+          rating: number
+          review_count: number
+          specialty: string
+        }
+        Insert: {
+          created_at?: string
+          experience: string
+          id?: string
+          image_url?: string | null
+          name: string
+          rating?: number
+          review_count?: number
+          specialty: string
+        }
+        Update: {
+          created_at?: string
+          experience?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          rating?: number
+          review_count?: number
+          specialty?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
