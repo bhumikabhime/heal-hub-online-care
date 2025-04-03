@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import Layout from '@/components/layout/Layout';
 import DoctorCard from '@/components/ui/DoctorCard';
 import { Button } from '@/components/ui/button';
@@ -12,106 +13,55 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/components/ui/use-toast';
 
 const DoctorsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [specialtyFilter, setSpecialtyFilter] = useState('all');
+  const { toast } = useToast();
 
-  // Mock data for doctors
-  const doctors = [
-    {
-      id: "1",
-      name: "Dr. Sarah Johnson",
-      specialty: "Cardiology",
-      rating: 4.9,
-      reviewCount: 124,
-      experience: "15",
-      imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
-    },
-    {
-      id: "2",
-      name: "Dr. Michael Chen",
-      specialty: "Neurology",
-      rating: 4.8,
-      reviewCount: 98,
-      experience: "12",
-      imageUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
-    },
-    {
-      id: "3",
-      name: "Dr. Jessica Patel",
-      specialty: "Pediatrics",
-      rating: 4.9,
-      reviewCount: 156,
-      experience: "10",
-      imageUrl: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
-    },
-    {
-      id: "4",
-      name: "Dr. Robert Thompson",
-      specialty: "Orthopedics",
-      rating: 4.7,
-      reviewCount: 87,
-      experience: "20",
-      imageUrl: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
-    },
-    {
-      id: "5",
-      name: "Dr. Emily Wilson",
-      specialty: "Dermatology",
-      rating: 4.9,
-      reviewCount: 102,
-      experience: "8",
-      imageUrl: "https://images.unsplash.com/photo-1527613426441-4da17471b66d?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
-    },
-    {
-      id: "6",
-      name: "Dr. James Rodriguez",
-      specialty: "Cardiology",
-      rating: 4.8,
-      reviewCount: 114,
-      experience: "17",
-      imageUrl: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
-    },
-    {
-      id: "7",
-      name: "Dr. Linda Chang",
-      specialty: "Neurology",
-      rating: 4.7,
-      reviewCount: 78,
-      experience: "11",
-      imageUrl: "https://images.unsplash.com/photo-1651008376811-b90baee60c1f?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
-    },
-    {
-      id: "8",
-      name: "Dr. Thomas Baker",
-      specialty: "Orthopedics",
-      rating: 4.6,
-      reviewCount: 91,
-      experience: "14",
-      imageUrl: "https://images.unsplash.com/photo-1622902046580-2b47f47f5471?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
-    },
-    {
-      id: "9",
-      name: "Dr. Maria González",
-      specialty: "Pediatrics",
-      rating: 4.9,
-      reviewCount: 132,
-      experience: "13",
-      imageUrl: "https://images.unsplash.com/photo-1614608682850-e0d6ed316d47?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
+  // Fetch doctors from Supabase
+  const { data: doctors, isLoading, error } = useQuery({
+    queryKey: ['doctors'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('doctors').select('*');
+      if (error) {
+        console.error('Error fetching doctors:', error);
+        toast({
+          title: "Error fetching doctors",
+          description: error.message,
+          variant: "destructive",
+        });
+        return [];
+      }
+      return data || [];
     }
-  ];
-
-  // Specialties list derived from doctors data
-  const specialties = ['all', ...new Set(doctors.map(doctor => doctor.specialty))];
+  });
 
   // Filter doctors based on search and specialty
-  const filteredDoctors = doctors.filter(doctor => {
+  const filteredDoctors = doctors?.filter(doctor => {
     const nameMatch = doctor.name.toLowerCase().includes(searchQuery.toLowerCase());
     const specialtyMatch = specialtyFilter === 'all' || doctor.specialty === specialtyFilter;
     return nameMatch && specialtyMatch;
-  });
+  }) || [];
+
+  // Get unique specialties from the data
+  const specialties = doctors 
+    ? ['all', ...new Set(doctors.map(doctor => doctor.specialty))] 
+    : ['all'];
+
+  // Handle error state
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error connecting to database",
+        description: "Could not fetch doctors data. Please try again later.",
+        variant: "destructive",
+      });
+    }
+  }, [error, toast]);
 
   return (
     <Layout>
@@ -162,8 +112,16 @@ const DoctorsPage = () => {
             </div>
           </div>
 
+          {/* Loading state */}
+          {isLoading && (
+            <div className="text-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+              <p className="mt-4 text-gray-500">Loading doctors...</p>
+            </div>
+          )}
+
           {/* Doctor Grid */}
-          {filteredDoctors.length > 0 ? (
+          {!isLoading && filteredDoctors.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredDoctors.map((doctor) => (
                 <DoctorCard
@@ -172,13 +130,13 @@ const DoctorsPage = () => {
                   name={doctor.name}
                   specialty={doctor.specialty}
                   rating={doctor.rating}
-                  reviewCount={doctor.reviewCount}
+                  reviewCount={doctor.review_count}
                   experience={doctor.experience}
-                  imageUrl={doctor.imageUrl}
+                  imageUrl={doctor.image_url}
                 />
               ))}
             </div>
-          ) : (
+          ) : !isLoading && (
             <div className="text-center py-12">
               <p className="text-gray-500 mb-4">No doctors found matching your criteria.</p>
               <Button onClick={() => {
