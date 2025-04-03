@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +18,12 @@ const AuthPage = () => {
   const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const isRegisterPage = location.pathname === '/register';
   const { toast } = useToast();
+  
+  // Set default active tab based on current path
+  const defaultTab = isRegisterPage ? 'signup' : 'signin';
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,6 +76,9 @@ const AuthPage = () => {
         title: "Registration successful",
         description: "Please check your email to confirm your account",
       });
+      
+      // Redirect to login page after successful registration
+      navigate('/login');
     } catch (error: any) {
       toast({
         title: "Error signing up",
@@ -93,10 +101,20 @@ const AuthPage = () => {
         
         <Card>
           <CardHeader>
-            <Tabs defaultValue="signin" className="w-full">
+            <Tabs defaultValue={defaultTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                <TabsTrigger 
+                  value="signin" 
+                  onClick={() => navigate('/login')}
+                >
+                  Sign In
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="signup" 
+                  onClick={() => navigate('/register')}
+                >
+                  Sign Up
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="signin" className="mt-4">
@@ -111,7 +129,7 @@ const AuthPage = () => {
             </Tabs>
           </CardHeader>
           
-          <Tabs defaultValue="signin">
+          <Tabs defaultValue={defaultTab}>
             <TabsContent value="signin">
               <form onSubmit={handleSignIn}>
                 <CardContent className="space-y-4">
