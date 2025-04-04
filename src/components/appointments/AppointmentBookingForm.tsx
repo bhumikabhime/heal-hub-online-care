@@ -63,9 +63,15 @@ const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = React.memo
       // Convert the date to string format for Supabase
       const appointmentDateStr = format(values.appointment_date, 'yyyy-MM-dd');
       
+      // Ensure we have all required fields for the appointments table
       const appointmentData = {
-        ...values,
+        doctor_id: values.doctor_id,
+        patient_name: values.patient_name,
+        patient_email: values.patient_email,
         appointment_date: appointmentDateStr,
+        appointment_time: values.appointment_time,
+        reason: values.reason || null,
+        location: values.location,
         status: 'upcoming'
       };
 

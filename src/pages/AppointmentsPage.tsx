@@ -14,7 +14,7 @@ const AppointmentsPage: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch doctors with stale time and caching
+  // Fetch doctors with stale time and caching - updated to use the correct options
   const { data: doctors, isLoading: isLoadingDoctors } = useQuery({
     queryKey: ['doctors'],
     queryFn: async () => {
@@ -30,10 +30,10 @@ const AppointmentsPage: React.FC = () => {
       return data || [];
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (replaces cacheTime)
   });
 
-  // Fetch user's appointments with optimized caching
+  // Fetch user's appointments with optimized caching - updated to use the correct options
   const { data: appointments, isLoading: isLoadingAppointments } = useQuery({
     queryKey: ['appointments', user?.email],
     queryFn: async () => {
