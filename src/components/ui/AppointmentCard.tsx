@@ -19,7 +19,7 @@ export interface AppointmentCardProps {
   onCancel?: (id: string) => void;
 }
 
-const AppointmentCard: React.FC<AppointmentCardProps> = ({
+const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(({
   id,
   doctorName,
   doctorSpecialty,
@@ -44,6 +44,9 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     }
   };
 
+  // Only show action buttons for upcoming appointments
+  const showActions = status === 'upcoming' && (onReschedule || onCancel);
+
   return (
     <Card>
       <CardContent className="p-6">
@@ -53,6 +56,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
               src={doctorImage} 
               alt={doctorName}
               className="h-full w-full object-cover"
+              loading="lazy" // Add lazy loading for images
             />
           </Avatar>
           <div className="flex-1">
@@ -79,26 +83,32 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
           </div>
         </div>
       </CardContent>
-      {status === 'upcoming' && (
+      {showActions && (
         <CardFooter className="px-6 py-4 bg-gray-50 flex justify-end space-x-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => onReschedule?.(id)}
-          >
-            Reschedule
-          </Button>
-          <Button 
-            variant="destructive" 
-            size="sm" 
-            onClick={() => onCancel?.(id)}
-          >
-            Cancel
-          </Button>
+          {onReschedule && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => onReschedule(id)}
+            >
+              Reschedule
+            </Button>
+          )}
+          {onCancel && (
+            <Button 
+              variant="destructive" 
+              size="sm" 
+              onClick={() => onCancel(id)}
+            >
+              Cancel
+            </Button>
+          )}
         </CardFooter>
       )}
     </Card>
   );
-};
+});
+
+AppointmentCard.displayName = 'AppointmentCard';
 
 export default AppointmentCard;

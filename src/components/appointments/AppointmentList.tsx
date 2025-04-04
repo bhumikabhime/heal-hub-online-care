@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Clock, CalendarCheck, CalendarX, Loader2 } from 'lucide-react';
 import AppointmentCard from '@/components/ui/AppointmentCard';
@@ -22,15 +22,66 @@ interface AppointmentListProps {
   onCancel: (id: string) => void;
 }
 
-const AppointmentList: React.FC<AppointmentListProps> = ({ 
+const AppointmentList: React.FC<AppointmentListProps> = React.memo(({ 
   appointments, 
   isLoading, 
   onReschedule, 
   onCancel 
 }) => {
-  const upcomingAppointments = appointments.filter(app => app.status === 'upcoming');
-  const completedAppointments = appointments.filter(app => app.status === 'completed');
-  const cancelledAppointments = appointments.filter(app => app.status === 'cancelled');
+  // Memoize filtered appointments to prevent recalculation on re-renders
+  const {
+    upcomingAppointments,
+    completedAppointments,
+    cancelledAppointments
+  } = useMemo(() => {
+    return {
+      upcomingAppointments: appointments.filter(app => app.status === 'upcoming'),
+      completedAppointments: appointments.filter(app => app.status === 'completed'),
+      cancelledAppointments: appointments.filter(app => app.status === 'cancelled')
+    };
+  }, [appointments]);
+
+  // Memoize appointment list rendering
+  const renderAppointments = useMemo(() => ({
+    upcoming: upcomingAppointments.length > 0 ? (
+      upcomingAppointments.map(appointment => (
+        <AppointmentCard
+          key={appointment.id}
+          {...appointment}
+          onReschedule={onReschedule}
+          onCancel={() => onCancel(appointment.id)}
+        />
+      ))
+    ) : (
+      <div className="text-center py-8">
+        <p className="text-gray-500">No upcoming appointments.</p>
+      </div>
+    ),
+    completed: completedAppointments.length > 0 ? (
+      completedAppointments.map(appointment => (
+        <AppointmentCard
+          key={appointment.id}
+          {...appointment}
+        />
+      ))
+    ) : (
+      <div className="text-center py-8">
+        <p className="text-gray-500">No completed appointments.</p>
+      </div>
+    ),
+    cancelled: cancelledAppointments.length > 0 ? (
+      cancelledAppointments.map(appointment => (
+        <AppointmentCard
+          key={appointment.id}
+          {...appointment}
+        />
+      ))
+    ) : (
+      <div className="text-center py-8">
+        <p className="text-gray-500">No cancelled appointments.</p>
+      </div>
+    )
+  }), [upcomingAppointments, completedAppointments, cancelledAppointments, onReschedule, onCancel]);
 
   return (
     <Tabs defaultValue="upcoming">
@@ -56,54 +107,25 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
         </div>
       )}
       
-      <TabsContent value="upcoming" className="space-y-4">
-        {!isLoading && upcomingAppointments.length > 0 ? (
-          upcomingAppointments.map(appointment => (
-            <AppointmentCard
-              key={appointment.id}
-              {...appointment}
-              onReschedule={onReschedule}
-              onCancel={() => onCancel(appointment.id)}
-            />
-          ))
-        ) : !isLoading && (
-          <div className="text-center py-8">
-            <p className="text-gray-500">No upcoming appointments.</p>
-          </div>
-        )}
-      </TabsContent>
-      
-      <TabsContent value="completed" className="space-y-4">
-        {!isLoading && completedAppointments.length > 0 ? (
-          completedAppointments.map(appointment => (
-            <AppointmentCard
-              key={appointment.id}
-              {...appointment}
-            />
-          ))
-        ) : !isLoading && (
-          <div className="text-center py-8">
-            <p className="text-gray-500">No completed appointments.</p>
-          </div>
-        )}
-      </TabsContent>
-      
-      <TabsContent value="cancelled" className="space-y-4">
-        {!isLoading && cancelledAppointments.length > 0 ? (
-          cancelledAppointments.map(appointment => (
-            <AppointmentCard
-              key={appointment.id}
-              {...appointment}
-            />
-          ))
-        ) : !isLoading && (
-          <div className="text-center py-8">
-            <p className="text-gray-500">No cancelled appointments.</p>
-          </div>
-        )}
-      </TabsContent>
+      {!isLoading && (
+        <>
+          <TabsContent value="upcoming" className="space-y-4">
+            {renderAppointments.upcoming}
+          </TabsContent>
+          
+          <TabsContent value="completed" className="space-y-4">
+            {renderAppointments.completed}
+          </TabsContent>
+          
+          <TabsContent value="cancelled" className="space-y-4">
+            {renderAppointments.cancelled}
+          </TabsContent>
+        </>
+      )}
     </Tabs>
   );
-};
+});
+
+AppointmentList.displayName = 'AppointmentList';
 
 export default AppointmentList;

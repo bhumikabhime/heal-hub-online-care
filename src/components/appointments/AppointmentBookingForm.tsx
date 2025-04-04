@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Schema for form validation
 const appointmentSchema = z.object({
@@ -34,7 +35,7 @@ interface AppointmentBookingFormProps {
   onClose: () => void;
 }
 
-const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
+const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = React.memo(({
   doctors,
   selectedDate,
   availableTimes,
@@ -42,13 +43,14 @@ const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
 }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // Form initialization
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(appointmentSchema),
     defaultValues: {
-      patient_name: '',
-      patient_email: '',
+      patient_name: user?.user_metadata?.full_name || '',
+      patient_email: user?.email || '',
       reason: '',
       location: 'Main Hospital',
       appointment_time: ''
@@ -64,9 +66,10 @@ const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
       const appointmentData = {
         ...values,
         appointment_date: appointmentDateStr,
+        status: 'upcoming'
       };
 
-      const { error } = await supabase.from('appointments').insert([appointmentData]);
+      const { error } = await supabase.from('appointments').insert(appointmentData);
       
       if (error) {
         throw new Error(error.message);
@@ -81,7 +84,7 @@ const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
       onClose();
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Booking Failed",
         description: error.message,
@@ -90,9 +93,9 @@ const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
     }
   });
 
-  const onSubmit = (values: AppointmentFormValues) => {
+  const onSubmit = useCallback((values: AppointmentFormValues) => {
     bookAppointment.mutate(values);
-  };
+  }, [bookAppointment]);
 
   return (
     <Form {...form}>
@@ -235,6 +238,8 @@ const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
       </form>
     </Form>
   );
-};
+});
+
+AppointmentBookingForm.displayName = 'AppointmentBookingForm';
 
 export default AppointmentBookingForm;

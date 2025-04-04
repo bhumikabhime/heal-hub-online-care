@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import Layout from '@/components/layout/Layout';
@@ -14,7 +14,7 @@ const AppointmentsPage: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch doctors
+  // Fetch doctors with stale time and caching
   const { data: doctors, isLoading: isLoadingDoctors } = useQuery({
     queryKey: ['doctors'],
     queryFn: async () => {
@@ -28,10 +28,12 @@ const AppointmentsPage: React.FC = () => {
         return [];
       }
       return data || [];
-    }
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
   });
 
-  // Fetch user's appointments
+  // Fetch user's appointments with optimized caching
   const { data: appointments, isLoading: isLoadingAppointments } = useQuery({
     queryKey: ['appointments', user?.email],
     queryFn: async () => {
@@ -70,7 +72,9 @@ const AppointmentsPage: React.FC = () => {
         status: appointment.status as 'upcoming' | 'completed' | 'cancelled'
       })) || [];
     },
-    enabled: !!user
+    enabled: !!user,
+    staleTime: 1 * 60 * 1000, // 1 minute
+    refetchOnWindowFocus: true,
   });
 
   // Handle appointment cancellation
@@ -99,16 +103,17 @@ const AppointmentsPage: React.FC = () => {
     }
   });
 
-  const handleReschedule = (id: string) => {
+  // Use callbacks for event handlers to prevent unnecessary re-renders
+  const handleReschedule = useCallback((id: string) => {
     toast({
       title: "Reschedule Requested",
       description: `You've requested to reschedule appointment #${id}. Our staff will contact you shortly.`,
     });
-  };
+  }, [toast]);
 
-  const handleCancel = (id: string) => {
+  const handleCancel = useCallback((id: string) => {
     cancelAppointment.mutate(id);
-  };
+  }, [cancelAppointment]);
   
   return (
     <Layout>
