@@ -1,6 +1,6 @@
-
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/contexts/AuthContext';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import AppointmentCard from '@/components/ui/AppointmentCard';
@@ -19,7 +19,6 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 
-// Form schema for booking appointments
 const appointmentSchema = z.object({
   doctor_id: z.string({ required_error: "Please select a doctor" }),
   patient_name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -33,6 +32,7 @@ const appointmentSchema = z.object({
 type AppointmentFormValues = z.infer<typeof appointmentSchema>;
 
 const AppointmentsPage = () => {
+  const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -51,8 +51,7 @@ const AppointmentsPage = () => {
     "03:30 PM - 04:00 PM", 
     "04:00 PM - 04:30 PM"
   ]);
-  
-  // Fetch doctors for appointment booking
+
   const { data: doctors, isLoading: isLoadingDoctors } = useQuery({
     queryKey: ['doctors'],
     queryFn: async () => {
@@ -69,19 +68,24 @@ const AppointmentsPage = () => {
     }
   });
 
-  // Fetch appointments from Supabase
   const { data: appointments, isLoading: isLoadingAppointments, error: appointmentsError } = useQuery({
-    queryKey: ['appointments'],
+    queryKey: ['appointments', user?.email],
     queryFn: async () => {
-      const { data, error } = await supabase.from('appointments').select(`
-        *,
-        doctors (
-          id,
-          name,
-          specialty,
-          image_url
-        )
-      `);
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('appointments')
+        .select(`
+          *,
+          doctors (
+            id,
+            name,
+            specialty,
+            image_url
+          )
+        `)
+        .eq('patient_email', user.email);
+
       if (error) {
         toast({
           title: "Error fetching appointments",
@@ -91,7 +95,6 @@ const AppointmentsPage = () => {
         return [];
       }
 
-      // Transform data to match the expected format for AppointmentCard
       return data?.map(appointment => ({
         id: appointment.id,
         doctorName: appointment.doctors?.name || 'Unknown Doctor',
@@ -102,10 +105,10 @@ const AppointmentsPage = () => {
         location: appointment.location,
         status: appointment.status
       })) || [];
-    }
+    },
+    enabled: !!user
   });
 
-  // Mutation for booking an appointment
   const bookAppointment = useMutation({
     mutationFn: async (values: AppointmentFormValues) => {
       const { error } = await supabase.from('appointments').insert([values]);
@@ -143,12 +146,10 @@ const AppointmentsPage = () => {
     }
   });
 
-  // Handle appointment form submission
   const onSubmit = (values: AppointmentFormValues) => {
     bookAppointment.mutate(values);
   };
 
-  // Handle reschedule appointment
   const handleReschedule = (id: string) => {
     toast({
       title: "Reschedule Requested",
@@ -156,7 +157,6 @@ const AppointmentsPage = () => {
     });
   };
 
-  // Handle cancel appointment
   const handleCancel = async (id: string) => {
     try {
       const { error } = await supabase
@@ -181,13 +181,17 @@ const AppointmentsPage = () => {
     }
   };
 
-  // Filter appointments by status
   const upcomingAppointments = appointments?.filter(app => app.status === 'upcoming') || [];
   const completedAppointments = appointments?.filter(app => app.status === 'completed') || [];
   const cancelledAppointments = appointments?.filter(app => app.status === 'cancelled') || [];
   
   return (
     <Layout>
+      {!user && (
+        <div className="text-center py-8">
+          <p className="text-gray-500">Please log in to view your appointments.</p>
+        </div>
+      )}
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -198,7 +202,6 @@ const AppointmentsPage = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Calendar & New Appointment Section */}
             <div className="lg:col-span-1">
               <Card>
                 <CardHeader>
@@ -381,7 +384,6 @@ const AppointmentsPage = () => {
               </Card>
             </div>
             
-            {/* Appointments List */}
             <div className="lg:col-span-2">
               <Tabs defaultValue="upcoming">
                 <TabsList className="grid w-full grid-cols-3 mb-6">
@@ -399,7 +401,6 @@ const AppointmentsPage = () => {
                   </TabsTrigger>
                 </TabsList>
                 
-                {/* Loading state */}
                 {isLoadingAppointments && (
                   <div className="text-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
