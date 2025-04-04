@@ -6,7 +6,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
-interface AppointmentCardProps {
+export interface AppointmentCardProps {
   id: string;
   doctorName: string;
   doctorSpecialty: string;
