@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Hospital, User, Search, Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import ThemeToggle from '@/components/theme/ThemeToggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,13 +45,13 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-sm border-b">
+    <nav className="bg-background border-b border-border shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <Hospital className="h-8 w-8 text-primary" />
-              <span className="ml-2 text-xl font-bold text-gray-900">HealHub</span>
+              <span className="ml-2 text-xl font-bold text-foreground">HealHub</span>
             </Link>
             <div className="hidden md:block ml-10">
               <div className="flex space-x-4">
@@ -67,6 +67,8 @@ const Navbar = () => {
             <Button variant="ghost" size="icon">
               <Search className="h-5 w-5" />
             </Button>
+            
+            <ThemeToggle />
 
             {user ? (
               <DropdownMenu>
@@ -132,6 +134,10 @@ const Navbar = () => {
             <Link to="/appointments" className="nav-link block">Appointments</Link>
             <Link to="/services" className="nav-link block">Services</Link>
             <Link to="/contact" className="nav-link block">Contact</Link>
+            <div className="flex items-center py-2">
+              <ThemeToggle />
+              <span className="ml-2 text-sm text-foreground">Toggle theme</span>
+            </div>
           </div>
           <div className="pt-4 pb-3 border-t border-gray-200 flex flex-col space-y-2 px-4">
             {user ? (
