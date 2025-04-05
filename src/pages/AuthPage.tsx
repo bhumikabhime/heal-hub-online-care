@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -8,8 +8,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { Hospital } from 'lucide-react';
+import { Hospital, Loader2 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AuthPage = () => {
   const [email, setEmail] = useState('');
@@ -21,15 +22,27 @@ const AuthPage = () => {
   const location = useLocation();
   const isRegisterPage = location.pathname === '/register';
   const { toast } = useToast();
+  const { user } = useAuth();
   
   // Set default active tab based on current path
   const defaultTab = isRegisterPage ? 'signup' : 'signin';
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
+      if (!email || !password) {
+        throw new Error('Email and password are required');
+      }
+      
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -44,6 +57,7 @@ const AuthPage = () => {
       
       navigate('/');
     } catch (error: any) {
+      console.error('Sign in error:', error);
       toast({
         title: "Error signing in",
         description: error.message,
@@ -169,7 +183,12 @@ const AuthPage = () => {
                 
                 <CardFooter>
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Signing in...' : 'Sign In'}
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : 'Sign In'}
                   </Button>
                 </CardFooter>
               </form>
@@ -227,7 +246,12 @@ const AuthPage = () => {
                 
                 <CardFooter>
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Creating account...' : 'Sign Up'}
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating account...
+                      </>
+                    ) : 'Sign Up'}
                   </Button>
                 </CardFooter>
               </form>
