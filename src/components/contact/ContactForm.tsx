@@ -37,7 +37,8 @@ const ContactForm: React.FC = () => {
 
   const mutation = useMutation({
     mutationFn: async (values: FormValues) => {
-      const { error } = await supabase.from('enquiries').insert([values]);
+      // Fix: Pass values directly instead of an array
+      const { error } = await supabase.from('enquiries').insert(values);
       if (error) throw error;
     },
     onSuccess: () => {

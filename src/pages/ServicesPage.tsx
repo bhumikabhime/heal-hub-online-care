@@ -8,7 +8,7 @@ import DoctorCard from '@/components/ui/DoctorCard';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Stethoscope, HeartPulse, Brain, Eye, Bone, Baby, Flask, Activity } from 'lucide-react';
+import { Loader2, Stethoscope, HeartPulse, Brain, Eye, Bone, Baby, Activity } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 // Define services with their icons
@@ -52,7 +52,7 @@ const services = [
     id: 'pathology',
     title: 'Pathology',
     description: 'Diagnostic services including laboratory testing and analysis to identify diseases and conditions.',
-    icon: <Flask className="h-8 w-8" />,
+    icon: <Activity className="h-8 w-8" />,
     link: '/services/pathology'
   }
 ];
