@@ -22,6 +22,14 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+// Define a type that matches what Supabase expects
+type EnquiryInsert = {
+  name: string;
+  email: string;
+  message: string;
+  phone?: string | null;
+};
+
 const ContactForm: React.FC = () => {
   const { toast } = useToast();
 
@@ -37,8 +45,15 @@ const ContactForm: React.FC = () => {
 
   const mutation = useMutation({
     mutationFn: async (values: FormValues) => {
-      // Fix: Pass values directly instead of an array
-      const { error } = await supabase.from('enquiries').insert(values);
+      // Convert FormValues to EnquiryInsert to ensure required fields are present
+      const enquiry: EnquiryInsert = {
+        name: values.name,
+        email: values.email,
+        message: values.message,
+        phone: values.phone || null,
+      };
+      
+      const { error } = await supabase.from('enquiries').insert(enquiry);
       if (error) throw error;
     },
     onSuccess: () => {
