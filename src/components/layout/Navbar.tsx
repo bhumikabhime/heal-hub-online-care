@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Hospital, User, Search, Menu, X, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +17,7 @@ import { useToast } from '@/components/ui/use-toast';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, userRole, signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -86,14 +87,12 @@ const Navbar = () => {
                   <DropdownMenuItem>
                     <Link to="/appointments" className="w-full">My Appointments</Link>
                   </DropdownMenuItem>
-                  {userRole?.is_admin && (
-                    <DropdownMenuItem>
-                      <Link to="/admin" className="w-full flex items-center">
-                        <LayoutDashboard className="h-4 w-4 mr-2" />
-                        Admin Dashboard
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
+                  <DropdownMenuItem>
+                    <Link to="/admin" className="w-full flex items-center">
+                      <LayoutDashboard className="h-4 w-4 mr-2" />
+                      Admin Dashboard
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="h-4 w-4 mr-2" />
@@ -138,7 +137,7 @@ const Navbar = () => {
             <Link to="/appointments" className="nav-link block">Appointments</Link>
             <Link to="/services" className="nav-link block">Services</Link>
             <Link to="/contact" className="nav-link block">Contact</Link>
-            {user && userRole?.is_admin && (
+            {user && (
               <Link to="/admin" className="nav-link block flex items-center">
                 <LayoutDashboard className="h-4 w-4 mr-2" />
                 Admin Dashboard

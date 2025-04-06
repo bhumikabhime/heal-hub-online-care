@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Navigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import EnquiriesList from '@/components/contact/EnquiriesList';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,23 +7,8 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
 const EnquiriesPage: React.FC = () => {
-  const { user, userRole, loading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
-
-  if (loading) {
-    return (
-      <Layout>
-        <div className="container mx-auto px-4 py-12 flex justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
-      </Layout>
-    );
-  }
-
-  // Redirect if not an admin
-  if (user && !userRole?.is_admin) {
-    return <Navigate to="/" replace />;
-  }
 
   return (
     <Layout>
