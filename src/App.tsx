@@ -13,13 +13,13 @@ import ContactPage from "./pages/ContactPage";
 import EnquiriesPage from "./pages/EnquiriesPage";
 import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      {/* Removed ThemeProvider */}
       <AuthProvider>
         <Toaster />
         <Sonner />
@@ -31,6 +31,7 @@ const App = () => (
             <Route path="/appointments" element={<AppointmentsPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/admin/enquiries" element={<EnquiriesPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/login" element={<AuthPage />} />
             <Route path="/register" element={<AuthPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

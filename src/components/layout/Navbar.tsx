@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Hospital, User, Search, Menu, X, LogOut } from 'lucide-react';
+import { Hospital, User, Search, Menu, X, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -86,6 +87,12 @@ const Navbar = () => {
                   <DropdownMenuItem>
                     <Link to="/appointments" className="w-full">My Appointments</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to="/admin" className="w-full flex items-center">
+                      <LayoutDashboard className="h-4 w-4 mr-2" />
+                      Admin Dashboard
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="h-4 w-4 mr-2" />
@@ -130,6 +137,12 @@ const Navbar = () => {
             <Link to="/appointments" className="nav-link block">Appointments</Link>
             <Link to="/services" className="nav-link block">Services</Link>
             <Link to="/contact" className="nav-link block">Contact</Link>
+            {user && (
+              <Link to="/admin" className="nav-link block flex items-center">
+                <LayoutDashboard className="h-4 w-4 mr-2" />
+                Admin Dashboard
+              </Link>
+            )}
           </div>
           <div className="pt-4 pb-3 border-t border-gray-200 flex flex-col space-y-2 px-4">
             {user ? (
