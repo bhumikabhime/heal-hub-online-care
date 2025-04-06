@@ -22,7 +22,7 @@ const queryClient = new QueryClient();
 
 // Admin route guard component
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, userRole, loading } = useAuth();
+  const { user, isAdmin, loading } = useAuth();
   
   if (loading) {
     return (
@@ -32,7 +32,7 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
   
-  if (!user || !userRole?.is_admin) {
+  if (!user || !isAdmin()) {
     return <Navigate to="/" replace />;
   }
   
