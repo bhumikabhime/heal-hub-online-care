@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Hospital, User, Search, Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import ThemeToggle from '@/components/theme/ThemeToggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +15,7 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -67,8 +66,6 @@ const Navbar = () => {
             <Button variant="ghost" size="icon">
               <Search className="h-5 w-5" />
             </Button>
-            
-            <ThemeToggle />
 
             {user ? (
               <DropdownMenu>
@@ -125,7 +122,6 @@ const Navbar = () => {
         </div>
       </div>
       
-      {/* Mobile menu */}
       {isOpen && (
         <div className="md:hidden">
           <div className="pt-2 pb-3 space-y-1 px-4">
@@ -134,10 +130,6 @@ const Navbar = () => {
             <Link to="/appointments" className="nav-link block">Appointments</Link>
             <Link to="/services" className="nav-link block">Services</Link>
             <Link to="/contact" className="nav-link block">Contact</Link>
-            <div className="flex items-center py-2">
-              <ThemeToggle />
-              <span className="ml-2 text-sm text-foreground">Toggle theme</span>
-            </div>
           </div>
           <div className="pt-4 pb-3 border-t border-gray-200 flex flex-col space-y-2 px-4">
             {user ? (
