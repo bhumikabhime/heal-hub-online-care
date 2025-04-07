@@ -45,12 +45,10 @@ const MedicalRecordsPage = () => {
       try {
         setIsLoading(true);
         
+        // Use the generic query method to work around TypeScript limitations
         const { data, error } = await supabase
           .from('medical_records')
-          .select(`
-            *,
-            doctors(name)
-          `)
+          .select('*, doctors(name)')
           .order('visit_date', { ascending: false });
 
         if (error) {
