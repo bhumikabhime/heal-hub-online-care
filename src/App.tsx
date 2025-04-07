@@ -10,6 +10,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import EnquiriesPage from './pages/EnquiriesPage';
 import NotFound from './pages/NotFound';
 import ServiceDetailPage from './pages/ServiceDetailPage';
+import DoctorProfilePage from './pages/DoctorProfilePage';
 import { AuthProvider } from './contexts/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
@@ -27,10 +28,11 @@ function App() {
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
             <Route path="/doctors" element={<DoctorsPage />} />
+            <Route path="/doctor/:doctorId" element={<DoctorProfilePage />} />
             <Route path="/appointments" element={<AppointmentsPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/login" element={<AuthPage />} />
-            <Route path="/register" element={<AuthPage isRegister />} />
+            <Route path="/register" element={<AuthPage />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/enquiries" element={<EnquiriesPage />} />
             <Route path="*" element={<NotFound />} />
