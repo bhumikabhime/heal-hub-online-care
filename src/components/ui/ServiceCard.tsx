@@ -9,13 +9,15 @@ interface ServiceCardProps {
   description: string;
   icon: React.ReactNode;
   link: string;
+  id: string; // Added id prop for identifying services
 }
 
 const ServiceCard: React.FC<ServiceCardProps> = ({
   title,
   description,
   icon,
-  link
+  link,
+  id
 }) => {
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-100 p-6 card-hover">
@@ -23,7 +25,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
       <h3 className="text-lg font-bold text-gray-900 mb-2">{title}</h3>
       <p className="text-gray-600 text-sm mb-4">{description}</p>
       <Button asChild variant="link" className="p-0 text-primary hover:text-primary/80">
-        <Link to={link} className="flex items-center">
+        <Link to={`/services/${id}`} className="flex items-center">
           Learn more
           <ArrowRight className="h-4 w-4 ml-1" />
         </Link>

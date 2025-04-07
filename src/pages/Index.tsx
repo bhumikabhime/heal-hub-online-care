@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -20,46 +19,46 @@ const HomePage = () => {
   // Mock data for services
   const services = [
     {
-      id: 1,
+      id: 'general-checkup',
       title: 'General Checkup',
       description: 'Comprehensive health examinations for overall wellness and preventive care.',
       icon: <Stethoscope className="w-8 h-8" />,
       link: '/services/general-checkup'
     },
     {
-      id: 2,
+      id: 'cardiology',
       title: 'Cardiology',
       description: 'Expert care for heart conditions, including diagnostics and treatments.',
       icon: <Heart className="w-8 h-8" />,
       link: '/services/cardiology'
     },
     {
-      id: 3,
+      id: 'neurology',
       title: 'Neurology',
       description: 'Specialized care for conditions affecting the brain and nervous system.',
       icon: <Brain className="w-8 h-8" />,
       link: '/services/neurology'
     },
     {
-      id: 4,
+      id: 'orthopedics',
       title: 'Orthopedics',
       description: 'Treatments for bone, joint, and muscle conditions to improve mobility.',
       icon: <Bone className="w-8 h-8" />,
       link: '/services/orthopedics'
     },
     {
-      id: 5,
+      id: 'pediatrics',
       title: 'Pediatrics',
       description: 'Comprehensive healthcare for infants, children, and adolescents.',
       icon: <Baby className="w-8 h-8" />,
       link: '/services/pediatrics'
     },
     {
-      id: 6,
+      id: 'pathology',
       title: 'Diagnostics',
       description: 'Advanced diagnostic services including lab tests and imaging.',
       icon: <Activity className="w-8 h-8" />,
-      link: '/services/diagnostics'
+      link: '/services/pathology'
     }
   ];
 
@@ -202,6 +201,7 @@ const HomePage = () => {
             {services.map((service) => (
               <ServiceCard 
                 key={service.id}
+                id={service.id}
                 title={service.title}
                 description={service.description}
                 icon={service.icon}
