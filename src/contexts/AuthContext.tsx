@@ -4,7 +4,7 @@ import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UserRole {
-  is_admin: boolean;
+  role: string | null;
 }
 
 interface AuthContextType {
@@ -13,6 +13,7 @@ interface AuthContextType {
   userRole: UserRole | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  isAdmin: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,7 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data, error } = await supabase
         .from('user_roles')
-        .select('is_admin')
+        .select('role')
         .eq('user_id', userId)
         .single();
 
@@ -81,12 +82,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await supabase.auth.signOut();
   };
 
+  const isAdmin = () => {
+    return userRole?.role === 'admin';
+  };
+
   const value = {
     session,
     user,
     userRole,
     loading,
     signOut,
+    isAdmin,
   };
 
   return (

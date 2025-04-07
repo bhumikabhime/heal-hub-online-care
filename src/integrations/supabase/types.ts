@@ -152,6 +152,53 @@ export type Database = {
         }
         Relationships: []
       }
+      medical_records: {
+        Row: {
+          created_at: string
+          diagnosis: string
+          doctor_id: string
+          id: string
+          notes: string | null
+          patient_email: string
+          patient_name: string
+          prescription: string
+          treatment: string
+          visit_date: string
+        }
+        Insert: {
+          created_at?: string
+          diagnosis: string
+          doctor_id: string
+          id?: string
+          notes?: string | null
+          patient_email: string
+          patient_name: string
+          prescription: string
+          treatment: string
+          visit_date: string
+        }
+        Update: {
+          created_at?: string
+          diagnosis?: string
+          doctor_id?: string
+          id?: string
+          notes?: string | null
+          patient_email?: string
+          patient_name?: string
+          prescription?: string
+          treatment?: string
+          visit_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_records_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

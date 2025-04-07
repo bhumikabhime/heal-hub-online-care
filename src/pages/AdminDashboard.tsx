@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
 const AdminDashboard: React.FC = () => {
-  const { user, userRole, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   const { toast } = useToast();
 
   // Show loading state
@@ -25,7 +25,7 @@ const AdminDashboard: React.FC = () => {
   }
 
   // Redirect if not an admin
-  if (user && !userRole?.is_admin) {
+  if (user && !isAdmin()) {
     toast({
       title: "Access Denied",
       description: "You do not have permission to access the admin dashboard",

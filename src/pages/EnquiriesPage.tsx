@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
 const EnquiriesPage: React.FC = () => {
-  const { user, userRole, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   if (loading) {
@@ -22,7 +22,7 @@ const EnquiriesPage: React.FC = () => {
   }
 
   // Redirect if not an admin
-  if (user && !userRole?.is_admin) {
+  if (user && !isAdmin()) {
     return <Navigate to="/" replace />;
   }
 

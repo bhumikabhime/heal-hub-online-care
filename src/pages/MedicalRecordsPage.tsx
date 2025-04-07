@@ -44,20 +44,14 @@ const MedicalRecordsPage = () => {
     const fetchMedicalRecords = async () => {
       try {
         setIsLoading(true);
-        let query = supabase
+        
+        const { data, error } = await supabase
           .from('medical_records')
           .select(`
             *,
-            doctors:doctor_id (name)
+            doctors(name)
           `)
           .order('visit_date', { ascending: false });
-
-        // If not admin, only fetch the current user's records
-        if (!isAdmin() && user) {
-          query = query.eq('patient_email', user.email);
-        }
-
-        const { data, error } = await query;
 
         if (error) {
           throw error;
@@ -84,7 +78,7 @@ const MedicalRecordsPage = () => {
     if (user) {
       fetchMedicalRecords();
     }
-  }, [user, isAdmin, toast]);
+  }, [user, toast]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
