@@ -12,7 +12,7 @@ import {
   SidebarFooter,
   SidebarTrigger 
 } from '@/components/ui/sidebar';
-import { Hospital, LayoutDashboard, Users, Calendar, MessageSquare, Settings, LogOut } from 'lucide-react';
+import { Hospital, LayoutDashboard, Users, Calendar, MessageSquare, Settings, LogOut, FileText } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -89,6 +89,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   <Link to="/admin/appointments">
                     <Calendar />
                     <span>Appointments</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={isActive('/medical-records')}>
+                  <Link to="/medical-records">
+                    <FileText />
+                    <span>Medical Records</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

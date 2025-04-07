@@ -11,6 +11,7 @@ import EnquiriesPage from './pages/EnquiriesPage';
 import NotFound from './pages/NotFound';
 import ServiceDetailPage from './pages/ServiceDetailPage';
 import DoctorProfilePage from './pages/DoctorProfilePage';
+import MedicalRecordsPage from './pages/MedicalRecordsPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
@@ -35,6 +36,7 @@ function App() {
             <Route path="/register" element={<AuthPage />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/enquiries" element={<EnquiriesPage />} />
+            <Route path="/medical-records" element={<MedicalRecordsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Toaster />
